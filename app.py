@@ -1,13 +1,16 @@
+import json
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-# In-memory item list
-items = [
-    {"id": 1, "name": "Apple"},
-    {"id": 2, "name": "Banana"},
-]
+file_path = 'my_flask_app\data\items.json'
 
+# In-memory item list
+with open(file_path, 'r') as file:
+    items = json.load(file)
+
+print(f"Items : {items}")    
+#  
 @app.route('/')
 def home():
     return "Welcome to the Flask App!"
@@ -33,6 +36,8 @@ def add_item():
     new_id = max(item["id"] for item in items) + 1 if items else 1
     new_item = {"id": new_id, "name": data["name"]}
     items.append(new_item)
+    with open(file_path, 'w') as file:
+        json.dump(items, file, indent=4)
     return jsonify(new_item), 201
 
 @app.route('/items/<int:item_id>', methods=['DELETE'])
